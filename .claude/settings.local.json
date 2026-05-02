@@ -46,7 +46,8 @@
       "Bash(xargs -r kill -9)",
       "Bash(pkill -9 -f \"node\")",
       "Bash(curl -s http://localhost:3000/)",
-      "Bash(curl -s http://localhost:3000/products)"
+      "Bash(curl -s http://localhost:3000/products)",
+      "Bash(git config *)"
     ]
   }
 }
