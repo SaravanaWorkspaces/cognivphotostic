@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  frontend:
+    name: Frontend — Lint, Test, Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test -- --passWithNoTests --ci
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_STRAPI_URL: ${{ secrets.STRAPI_URL || 'http://localhost:1337' }}
+          STRAPI_API_TOKEN: ${{ secrets.STRAPI_API_TOKEN || '' }}
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.SITE_URL || 'http://localhost:3000' }}
+
+  backend:
+    name: Backend — Install, Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          HOST: 0.0.0.0
+          PORT: 1337
+          APP_KEYS: test_key_1,test_key_2,test_key_3,test_key_4
+          API_TOKEN_SALT: test_salt
+          ADMIN_JWT_SECRET: test_admin_jwt
+          TRANSFER_TOKEN_SALT: test_transfer_salt
+          JWT_SECRET: test_jwt
+          DATABASE_CLIENT: sqlite
+          DATABASE_FILENAME: .tmp/test.db

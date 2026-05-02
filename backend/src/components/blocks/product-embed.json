@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_blocks_product_embeds",
+  "info": {
+    "displayName": "Product Embed Block"
+  },
+  "options": {},
+  "attributes": {
+    "product": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::product.product"
+    }
+  }
+}

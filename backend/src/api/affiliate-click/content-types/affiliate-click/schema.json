@@ -1,0 +1,35 @@
+{
+  "kind": "collectionType",
+  "collectionName": "affiliate_clicks",
+  "info": {
+    "singularName": "affiliate-click",
+    "pluralName": "affiliate-clicks",
+    "displayName": "Affiliate Click"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "productId": {
+      "type": "integer",
+      "required": true
+    },
+    "postId": {
+      "type": "integer"
+    },
+    "url": {
+      "type": "string",
+      "required": true
+    },
+    "ip": {
+      "type": "string"
+    },
+    "referer": {
+      "type": "string"
+    },
+    "test": {
+      "type": "string"
+    }
+  }
+}

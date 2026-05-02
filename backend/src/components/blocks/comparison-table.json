@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_blocks_comparison_tables",
+  "info": {
+    "displayName": "Comparison Table Block"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "rows": {
+      "type": "component",
+      "repeatable": true,
+      "component": "blocks.comparison-row"
+    }
+  }
+}
