@@ -15,9 +15,9 @@ export async function generateStaticParams() {
   try {
     const response = await getPosts({ pageSize: 100 });
     return (response.data || [])
-      .filter((post) => post.attributes?.slug)
+      .filter((post) => post.slug)
       .map((post) => ({
-        slug: post.attributes.slug,
+        slug: post.slug,
       }));
   } catch (err) {
     console.error('Failed to generate static params:', err);
@@ -37,25 +37,15 @@ export async function generateMetadata({
     if (!response?.data) {
       return { title: 'Post not found' };
     }
-    const post = response.data.attributes as Post;
+    const post = response.data as Post;
 
-    const seo = post.seo;
     return {
-      title: seo?.metaTitle || post.title,
-      description: seo?.metaDescription || post.excerpt,
+      title: post.title,
+      description: post.excerpt,
       openGraph: {
-        title: seo?.metaTitle || post.title,
-        description: seo?.metaDescription || post.excerpt,
+        title: post.title,
+        description: post.excerpt,
         url: `${config.site.url}/blog/${slug}`,
-        images: seo?.ogImage?.data?.attributes?.url
-          ? [
-              {
-                url: seo.ogImage.data.attributes.url,
-                width: seo.ogImage.data.attributes.width,
-                height: seo.ogImage.data.attributes.height,
-              },
-            ]
-          : [],
       },
     };
   } catch (err) {
@@ -76,12 +66,11 @@ export default async function PostPage({
     if (!response?.data) {
       notFound();
     }
-    const post = response.data.attributes as Post;
+    const post = response.data as Post;
     const postNumericId = response.data.id;
 
-    const imageData = post.coverImage?.data?.attributes;
-    const imageUrl = imageData?.url || 'https://via.placeholder.com/1200x600';
-    const category = post.category?.data?.attributes;
+    const imageUrl = post.coverImage?.url || 'https://via.placeholder.com/1200x600';
+    const category = post.category;
 
     const publishDate = new Date(post.publishedAt).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -119,8 +108,8 @@ export default async function PostPage({
 
             <p className="text-xl text-gray-600 mb-6">{post.excerpt}</p>
 
-            {post.tags && post.tags.data && post.tags.data.length > 0 && (
-              <TagList tags={post.tags.data} className="mb-6" />
+            {post.tags && post.tags.length > 0 && (
+              <TagList tags={post.tags} className="mb-6" />
             )}
           </div>
 

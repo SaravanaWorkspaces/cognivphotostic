@@ -12,9 +12,9 @@ export async function generateStaticParams() {
   try {
     const response = await getCategories();
     return (response.data || [])
-      .filter((cat) => cat.attributes?.slug)
+      .filter((cat) => cat.slug)
       .map((cat) => ({
-        slug: cat.attributes.slug,
+        slug: cat.slug,
       }));
   } catch (err) {
     console.error('Failed to generate category static params:', err);
@@ -34,7 +34,7 @@ export async function generateMetadata({
     if (!response?.data) {
       return { title: 'Category not found' };
     }
-    const category = response.data.attributes as Category;
+    const category = response.data as Category;
 
     return {
       title: `${category.name} - Home Decor & Interior Design`,
@@ -63,7 +63,7 @@ export default async function CategoryPage({
     if (!categoryResponse?.data) {
       notFound();
     }
-    const category = categoryResponse.data.attributes as Category;
+    const category = categoryResponse.data as Category;
 
     const postsResponse = await getPosts({
       category: slug,

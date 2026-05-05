@@ -1,17 +1,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { StrapiItem } from '@/types';
 import { Product } from '@/types';
 
 interface ProductCardProps {
-  product: StrapiItem<Product>;
+  product: Product;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
-  const p = product.attributes;
-  const imageData = p.image?.data?.attributes;
+export default function ProductCard({ product: p }: ProductCardProps) {
   const imageUrl =
-    imageData?.url || 'https://via.placeholder.com/300x200?text=No+Image';
+    p.image?.url || 'https://via.placeholder.com/300x200?text=No+Image';
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
@@ -45,7 +42,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           )}
 
           <Link
-            href={`/api/affiliate/${product.id}`}
+            href={`/api/affiliate/${p.id}`}
             className="px-4 py-2 bg-brand-500 text-white font-semibold rounded text-sm hover:bg-brand-600 transition-colors"
           >
             Shop Now →

@@ -1,13 +1,12 @@
 import Link from 'next/link';
 import { getPosts } from '@/lib/api';
-import { StrapiItem } from '@/types';
 import { Post } from '@/types';
 import PostGrid from '@/components/blog/PostGrid';
 
 export const revalidate = 1800;
 
 export default async function HomePage() {
-  let featuredPosts: StrapiItem<Post>[] = [];
+  let featuredPosts: Post[] = [];
   try {
     const response = await getPosts({ pageSize: 6 });
     featuredPosts = response.data || [];

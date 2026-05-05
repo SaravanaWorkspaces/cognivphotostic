@@ -6,15 +6,14 @@ interface ImageBlockProps {
 }
 
 export default function ImageBlock({ block }: ImageBlockProps) {
-  const imageData = block.image?.data?.attributes;
-  if (!imageData) return null;
+  if (!block.image) return null;
 
   return (
     <figure className="my-8">
       <div className="relative w-full h-96 bg-gray-100 rounded-lg overflow-hidden">
         <Image
-          src={imageData.url}
-          alt={block.image?.data?.attributes?.alternativeText || 'Image'}
+          src={block.image.url}
+          alt={block.image.alternativeText || 'Image'}
           fill
           className="object-cover"
         />

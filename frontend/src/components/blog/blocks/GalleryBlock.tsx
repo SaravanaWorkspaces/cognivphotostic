@@ -6,7 +6,7 @@ interface GalleryBlockProps {
 }
 
 export default function GalleryBlock({ block }: GalleryBlockProps) {
-  const images = block.images?.filter((img) => img?.data?.attributes);
+  const images = block.images?.filter((img) => img);
   if (!images || images.length === 0) return null;
 
   const colsClass = {
@@ -19,8 +19,7 @@ export default function GalleryBlock({ block }: GalleryBlockProps) {
   return (
     <div className={`grid ${colsClass} gap-4 my-8`}>
       {images.map((img, idx) => {
-        const imageData = img?.data?.attributes;
-        if (!imageData) return null;
+        if (!img) return null;
 
         return (
           <div
@@ -28,8 +27,8 @@ export default function GalleryBlock({ block }: GalleryBlockProps) {
             className="relative w-full h-64 bg-gray-100 rounded-lg overflow-hidden"
           >
             <Image
-              src={imageData.url}
-              alt={imageData.alternativeText || `Gallery image ${idx + 1}`}
+              src={img.url}
+              alt={img.alternativeText || `Gallery image ${idx + 1}`}
               fill
               className="object-cover hover:scale-105 transition-transform"
             />

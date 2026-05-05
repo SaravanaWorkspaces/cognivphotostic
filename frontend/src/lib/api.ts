@@ -87,16 +87,7 @@ function qs(params: Record<string, unknown>): string {
 // ─── Posts ────────────────────────────────────────────────────────────────────
 
 const POST_POPULATE = {
-  populate: {
-    coverImage: { fields: ['url', 'alternativeText', 'width', 'height', 'formats'] },
-    category: { fields: ['name', 'slug'] },
-    tags: { fields: ['name', 'slug'] },
-    seo: {
-      populate: {
-        ogImage: { fields: ['url', 'width', 'height'] },
-      },
-    },
-  },
+  populate: '*',
 };
 
 export async function getPosts(params?: {
@@ -128,22 +119,7 @@ export async function getPosts(params?: {
 
 export async function getPostBySlug(slug: string): Promise<StrapiSingleResponse<Post> | null> {
   const query = qs({
-    ...POST_POPULATE,
-    populate: {
-      ...POST_POPULATE.populate,
-      blocks: {
-        populate: {
-          image: { fields: ['url', 'alternativeText', 'width', 'height'] },
-          images: { fields: ['url', 'alternativeText', 'width', 'height'] },
-          product: {
-            populate: {
-              image: { fields: ['url', 'alternativeText', 'width', 'height'] },
-            },
-          },
-          rows: '*',
-        },
-      },
-    },
+    populate: '*',
     filters: { slug: { $eq: slug } },
   });
 
@@ -160,7 +136,7 @@ export async function getPostBySlug(slug: string): Promise<StrapiSingleResponse<
 // ─── Categories ───────────────────────────────────────────────────────────────
 
 export async function getCategories(): Promise<StrapiListResponse<Category>> {
-  const query = qs({ fields: ['name', 'slug', 'description'] });
+  const query = qs({});
 
   return fetchStrapi<StrapiListResponse<Category>>(`/categories${query}`, {
     revalidate: config.revalidate.categories,
@@ -190,9 +166,7 @@ export async function getProducts(params?: {
   const { page = 1, pageSize = config.pagination.pageSize } = params ?? {};
 
   const query = qs({
-    populate: {
-      image: { fields: ['url', 'alternativeText', 'width', 'height', 'formats'] },
-    },
+    populate: '*',
     pagination: { page, pageSize },
   });
 
@@ -204,9 +178,7 @@ export async function getProducts(params?: {
 
 export async function getProductBySlug(slug: string): Promise<StrapiSingleResponse<Product> | null> {
   const query = qs({
-    populate: {
-      image: { fields: ['url', 'alternativeText', 'width', 'height'] },
-    },
+    populate: '*',
     filters: { slug: { $eq: slug } },
   });
 

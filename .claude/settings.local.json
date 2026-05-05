@@ -47,7 +47,9 @@
       "Bash(pkill -9 -f \"node\")",
       "Bash(curl -s http://localhost:3000/)",
       "Bash(curl -s http://localhost:3000/products)",
-      "Bash(git config *)"
+      "Bash(git config *)",
+      "Bash(ssh root@YOUR_SERVER_IP \"tail -50 /root/.pm2/logs/strapi-error.log\")",
+      "Bash(curl *)"
     ]
   }
 }

@@ -1,20 +1,19 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Post, StrapiItem } from '@/types';
+import { Post } from '@/types';
 import CategoryBadge from '@/components/ui/CategoryBadge';
 
 interface PostCardProps {
-  post: StrapiItem<Post>;
+  post: Post;
 }
 
-export default function PostCard({ post }: PostCardProps) {
-  const p = post.attributes;
+export default function PostCard({ post: p }: PostCardProps) {
   if (!p) return null;
 
   const imageUrl =
-    p.coverImage?.data?.attributes?.url ||
+    p.coverImage?.url ||
     'https://via.placeholder.com/400x300?text=No+Image';
-  const imageAlt = p.coverImage?.data?.attributes?.alternativeText || p.title;
+  const imageAlt = p.coverImage?.alternativeText || p.title;
 
   const publishDate = p.publishedAt ? new Date(p.publishedAt).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -22,7 +21,7 @@ export default function PostCard({ post }: PostCardProps) {
     day: 'numeric',
   }) : '';
 
-  const category = p.category?.data?.attributes;
+  const category = p.category;
 
   return (
     <article className="flex flex-col h-full bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">

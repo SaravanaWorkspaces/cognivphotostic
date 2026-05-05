@@ -1,8 +1,8 @@
-import { Post, StrapiItem } from '@/types';
+import { Post } from '@/types';
 import PostCard from './PostCard';
 
 interface PostGridProps {
-  posts: StrapiItem<Post>[];
+  posts: Post[];
   className?: string;
 }
 

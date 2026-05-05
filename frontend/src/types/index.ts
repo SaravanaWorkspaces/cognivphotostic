@@ -1,19 +1,19 @@
-// ─── Strapi base wrapper types ───────────────────────────────────────────────
+// ─── Strapi base wrapper types (Strapi 5 flat structure) ────────────────────
 
 export interface StrapiSingleResponse<T> {
-  data: StrapiItem<T>;
+  data: T;
   meta: Record<string, unknown>;
 }
 
 export interface StrapiListResponse<T> {
-  data: StrapiItem<T>[];
+  data: T[];
   meta: StrapiPaginationMeta;
 }
 
 export interface StrapiItem<T> {
   id: number;
-  attributes: T;
-}
+  documentId: string;
+} & T;
 
 export interface StrapiPaginationMeta {
   pagination: {
@@ -25,22 +25,19 @@ export interface StrapiPaginationMeta {
 }
 
 export interface StrapiMedia {
-  data: {
-    id: number;
-    attributes: {
-      url: string;
-      alternativeText: string | null;
-      width: number;
-      height: number;
-      formats?: {
-        thumbnail?: MediaFormat;
-        small?: MediaFormat;
-        medium?: MediaFormat;
-        large?: MediaFormat;
-      };
-    };
-  } | null;
-}
+  id: number;
+  documentId: string;
+  url: string;
+  alternativeText: string | null;
+  width: number;
+  height: number;
+  formats?: {
+    thumbnail?: MediaFormat;
+    small?: MediaFormat;
+    medium?: MediaFormat;
+    large?: MediaFormat;
+  };
+} | null;
 
 export interface MediaFormat {
   url: string;
@@ -51,32 +48,46 @@ export interface MediaFormat {
 // ─── Domain types ─────────────────────────────────────────────────────────────
 
 export interface Post {
+  id: number;
+  documentId: string;
   title: string;
   slug: string;
   excerpt: string;
   publishedAt: string;
   updatedAt: string;
   createdAt: string;
+  author: string;
   coverImage: StrapiMedia;
-  category: StrapiSingleResponse<Category>;
-  tags: StrapiListResponse<Tag>;
+  category: Category | null;
+  tags: Tag[];
   blocks?: ContentBlock[];
-  seo: SEO | null;
+  seo?: SEO | null;
 }
 
 export interface Category {
+  id: number;
+  documentId: string;
   name: string;
   slug: string;
   description: string | null;
-  posts?: StrapiListResponse<Post>;
+  createdAt?: string;
+  updatedAt?: string;
+  publishedAt?: string;
 }
 
 export interface Tag {
+  id: number;
+  documentId: string;
   name: string;
   slug: string;
+  createdAt?: string;
+  updatedAt?: string;
+  publishedAt?: string;
 }
 
 export interface Product {
+  id: number;
+  documentId: string;
   name: string;
   slug: string;
   description: string | null;
@@ -85,6 +96,9 @@ export interface Product {
   currency: string;
   image: StrapiMedia;
   commissionRate?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  publishedAt?: string;
 }
 
 // ─── SEO ──────────────────────────────────────────────────────────────────────
@@ -128,7 +142,7 @@ export interface GalleryBlock {
 export interface ProductEmbedBlock {
   __component: 'blocks.product-embed';
   id: number;
-  product: StrapiSingleResponse<Product>;
+  product: Product;
 }
 
 export interface ComparisonTableBlock {

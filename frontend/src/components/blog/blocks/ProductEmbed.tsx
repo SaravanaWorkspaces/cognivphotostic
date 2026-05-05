@@ -8,12 +8,11 @@ interface ProductEmbedProps {
 }
 
 export default function ProductEmbed({ block, postId }: ProductEmbedProps) {
-  const product = block.product?.data?.attributes;
+  const product = block.product;
   if (!product) return null;
 
-  const imageData = product.image?.data?.attributes;
   const imageUrl =
-    imageData?.url || 'https://via.placeholder.com/300x200?text=No+Image';
+    product.image?.url || 'https://via.placeholder.com/300x200?text=No+Image';
 
   return (
     <div className="my-8 bg-brand-50 rounded-lg p-6 border border-brand-100">
@@ -22,7 +21,7 @@ export default function ProductEmbed({ block, postId }: ProductEmbedProps) {
           <div className="relative h-48 md:h-auto rounded-lg overflow-hidden bg-gray-100">
             <Image
               src={imageUrl}
-              alt={imageData?.alternativeText || product.name}
+              alt={product.image?.alternativeText || product.name}
               fill
               className="object-cover"
             />
@@ -48,7 +47,7 @@ export default function ProductEmbed({ block, postId }: ProductEmbedProps) {
             )}
 
             <Link
-              href={`/api/affiliate/${block.product?.data?.id}${postId ? `?postId=${postId}` : ''}`}
+              href={`/api/affiliate/${product.id}${postId ? `?postId=${postId}` : ''}`}
               className="px-4 py-2 bg-brand-500 text-white font-semibold rounded hover:bg-brand-600 transition-colors"
             >
               View Product →
