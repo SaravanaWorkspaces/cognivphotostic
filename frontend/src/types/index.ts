@@ -10,10 +10,10 @@ export interface StrapiListResponse<T> {
   meta: StrapiPaginationMeta;
 }
 
-export interface StrapiItem<T> {
+export type StrapiItem<T> = T & {
   id: number;
   documentId: string;
-} & T;
+};
 
 export interface StrapiPaginationMeta {
   pagination: {
@@ -24,7 +24,7 @@ export interface StrapiPaginationMeta {
   };
 }
 
-export interface StrapiMedia {
+export interface StrapiMediaObject {
   id: number;
   documentId: string;
   url: string;
@@ -37,7 +37,9 @@ export interface StrapiMedia {
     medium?: MediaFormat;
     large?: MediaFormat;
   };
-} | null;
+}
+
+export type StrapiMedia = StrapiMediaObject | null;
 
 export interface MediaFormat {
   url: string;
@@ -48,8 +50,6 @@ export interface MediaFormat {
 // ─── Domain types ─────────────────────────────────────────────────────────────
 
 export interface Post {
-  id: number;
-  documentId: string;
   title: string;
   slug: string;
   excerpt: string;
@@ -58,15 +58,13 @@ export interface Post {
   createdAt: string;
   author: string;
   coverImage: StrapiMedia;
-  category: Category | null;
-  tags: Tag[];
+  category: StrapiItem<Category> | null;
+  tags: StrapiItem<Tag>[];
   blocks?: ContentBlock[];
   seo?: SEO | null;
 }
 
 export interface Category {
-  id: number;
-  documentId: string;
   name: string;
   slug: string;
   description: string | null;
@@ -76,8 +74,6 @@ export interface Category {
 }
 
 export interface Tag {
-  id: number;
-  documentId: string;
   name: string;
   slug: string;
   createdAt?: string;
@@ -86,8 +82,6 @@ export interface Tag {
 }
 
 export interface Product {
-  id: number;
-  documentId: string;
   name: string;
   slug: string;
   description: string | null;
@@ -142,7 +136,7 @@ export interface GalleryBlock {
 export interface ProductEmbedBlock {
   __component: 'blocks.product-embed';
   id: number;
-  product: Product;
+  product: StrapiItem<Product>;
 }
 
 export interface ComparisonTableBlock {

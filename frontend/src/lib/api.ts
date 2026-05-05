@@ -2,6 +2,7 @@ import { config } from './config';
 import type {
   StrapiListResponse,
   StrapiSingleResponse,
+  StrapiItem,
   Post,
   Category,
   Tag,
@@ -95,7 +96,7 @@ export async function getPosts(params?: {
   pageSize?: number;
   category?: string;
   tag?: string;
-}): Promise<StrapiListResponse<Post>> {
+}): Promise<StrapiListResponse<StrapiItem<Post>>> {
   const { page = 1, pageSize = config.pagination.pageSize, category, tag } = params ?? {};
 
   const filters: Record<string, unknown> = {
@@ -111,19 +112,19 @@ export async function getPosts(params?: {
     pagination: { page, pageSize },
   });
 
-  return fetchStrapi<StrapiListResponse<Post>>(`/posts${query}`, {
+  return fetchStrapi<StrapiListResponse<StrapiItem<Post>>>(`/posts${query}`, {
     revalidate: config.revalidate.posts,
     tags: ['posts', ...(category ? [`category:${category}`] : [])],
   });
 }
 
-export async function getPostBySlug(slug: string): Promise<StrapiSingleResponse<Post> | null> {
+export async function getPostBySlug(slug: string): Promise<StrapiSingleResponse<StrapiItem<Post>> | null> {
   const query = qs({
     populate: '*',
     filters: { slug: { $eq: slug } },
   });
 
-  const res = await fetchStrapi<StrapiListResponse<Post>>(`/posts${query}`, {
+  const res = await fetchStrapi<StrapiListResponse<StrapiItem<Post>>>(`/posts${query}`, {
     revalidate: config.revalidate.posts,
     tags: [`post:${slug}`],
   });
@@ -135,19 +136,19 @@ export async function getPostBySlug(slug: string): Promise<StrapiSingleResponse<
 
 // ─── Categories ───────────────────────────────────────────────────────────────
 
-export async function getCategories(): Promise<StrapiListResponse<Category>> {
+export async function getCategories(): Promise<StrapiListResponse<StrapiItem<Category>>> {
   const query = qs({});
 
-  return fetchStrapi<StrapiListResponse<Category>>(`/categories${query}`, {
+  return fetchStrapi<StrapiListResponse<StrapiItem<Category>>>(`/categories${query}`, {
     revalidate: config.revalidate.categories,
     tags: ['categories'],
   });
 }
 
-export async function getCategoryBySlug(slug: string): Promise<StrapiSingleResponse<Category> | null> {
+export async function getCategoryBySlug(slug: string): Promise<StrapiSingleResponse<StrapiItem<Category>> | null> {
   const query = qs({ filters: { slug: { $eq: slug } } });
 
-  const res = await fetchStrapi<StrapiListResponse<Category>>(`/categories${query}`, {
+  const res = await fetchStrapi<StrapiListResponse<StrapiItem<Category>>>(`/categories${query}`, {
     revalidate: config.revalidate.categories,
     tags: ['categories'],
   });
@@ -162,7 +163,7 @@ export async function getCategoryBySlug(slug: string): Promise<StrapiSingleRespo
 export async function getProducts(params?: {
   page?: number;
   pageSize?: number;
-}): Promise<StrapiListResponse<Product>> {
+}): Promise<StrapiListResponse<StrapiItem<Product>>> {
   const { page = 1, pageSize = config.pagination.pageSize } = params ?? {};
 
   const query = qs({
@@ -170,19 +171,19 @@ export async function getProducts(params?: {
     pagination: { page, pageSize },
   });
 
-  return fetchStrapi<StrapiListResponse<Product>>(`/products${query}`, {
+  return fetchStrapi<StrapiListResponse<StrapiItem<Product>>>(`/products${query}`, {
     revalidate: config.revalidate.posts,
     tags: ['products'],
   });
 }
 
-export async function getProductBySlug(slug: string): Promise<StrapiSingleResponse<Product> | null> {
+export async function getProductBySlug(slug: string): Promise<StrapiSingleResponse<StrapiItem<Product>> | null> {
   const query = qs({
     populate: '*',
     filters: { slug: { $eq: slug } },
   });
 
-  const res = await fetchStrapi<StrapiListResponse<Product>>(`/products${query}`, {
+  const res = await fetchStrapi<StrapiListResponse<StrapiItem<Product>>>(`/products${query}`, {
     revalidate: 3600,
     tags: [`product:${slug}`],
   });

@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Product } from '@/types';
+import { Product, StrapiItem } from '@/types';
 
 interface ProductCardProps {
-  product: Product;
+  product: StrapiItem<Product>;
 }
 
 export default function ProductCard({ product: p }: ProductCardProps) {

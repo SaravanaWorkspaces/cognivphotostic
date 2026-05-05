@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { fetchStrapi, trackAffiliateClick } from '@/lib/api';
-import { StrapiSingleResponse, Product } from '@/types';
+import { StrapiSingleResponse, Product, StrapiItem } from '@/types';
 
 export async function GET(
   request: Request,
@@ -14,11 +14,11 @@ export async function GET(
   }
 
   // Fetch product for its affiliateUrl
-  const product = await fetchStrapi<StrapiSingleResponse<Product>>(
+  const product = await fetchStrapi<StrapiSingleResponse<StrapiItem<Product>>>(
     `/products/${productId}`,
     { noCache: true }
   );
-  const affiliateUrl = product?.data?.attributes?.affiliateUrl;
+  const affiliateUrl = product?.data?.affiliateUrl;
 
   if (!affiliateUrl) {
     return NextResponse.json({ error: 'Product not found' }, { status: 404 });

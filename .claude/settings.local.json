@@ -49,7 +49,9 @@
       "Bash(curl -s http://localhost:3000/products)",
       "Bash(git config *)",
       "Bash(ssh root@YOUR_SERVER_IP \"tail -50 /root/.pm2/logs/strapi-error.log\")",
-      "Bash(curl *)"
+      "Bash(curl *)",
+      "Bash(npx tsc *)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('LOGIN OK — user:', d['user']['username'], '| JWT starts:', d['jwt'][:30]+'...'\\)\")"
     ]
   }
 }

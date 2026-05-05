@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Post } from '@/types';
+import { Post, StrapiItem } from '@/types';
 import CategoryBadge from '@/components/ui/CategoryBadge';
+import { IMAGE_SIZES, getSizeRecommendation } from '@/lib/image-sizes';
 
 interface PostCardProps {
-  post: Post;
+  post: StrapiItem<Post>;
 }
 
 export default function PostCard({ post: p }: PostCardProps) {
@@ -14,6 +15,7 @@ export default function PostCard({ post: p }: PostCardProps) {
     p.coverImage?.url ||
     'https://via.placeholder.com/400x300?text=No+Image';
   const imageAlt = p.coverImage?.alternativeText || p.title;
+  const recommendedSize = getSizeRecommendation('COVER_IMAGE');
 
   const publishDate = p.publishedAt ? new Date(p.publishedAt).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -25,7 +27,10 @@ export default function PostCard({ post: p }: PostCardProps) {
 
   return (
     <article className="flex flex-col h-full bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-      <div className="relative h-48 w-full overflow-hidden bg-gray-100">
+      <div
+        className="relative h-48 w-full overflow-hidden bg-gray-100"
+        title={`Recommended cover image size: ${recommendedSize}`}
+      >
         <Image
           src={imageUrl}
           alt={imageAlt}

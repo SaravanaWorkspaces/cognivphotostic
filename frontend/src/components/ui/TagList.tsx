@@ -1,7 +1,7 @@
-import { Tag } from '@/types';
+import { Tag, StrapiItem } from '@/types';
 
 interface TagListProps {
-  tags: Tag[];
+  tags: StrapiItem<Tag>[];
   className?: string;
 }
 

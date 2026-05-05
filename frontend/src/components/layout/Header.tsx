@@ -32,13 +32,13 @@ export default async function Header() {
 
           {categories.length > 0 && (
             <div className="hidden md:flex items-center gap-4">
-              {categories.filter((cat) => cat.attributes?.slug).slice(0, 4).map((cat: any) => (
+              {categories.filter((cat) => cat.slug).slice(0, 4).map((cat) => (
                 <Link
                   key={cat.id}
-                  href={`/category/${cat.attributes?.slug}`}
+                  href={`/category/${cat.slug}`}
                   className="text-sm text-gray-600 hover:text-brand-600"
                 >
-                  {cat.attributes?.name}
+                  {cat.name}
                 </Link>
               ))}
             </div>
