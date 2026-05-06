@@ -23,7 +23,7 @@ function LoginForm() {
   const passwordRef = useRef<HTMLInputElement>(null);
 
   const searchParams = useSearchParams();
-  const callbackUrl  = searchParams.get('from') ?? '/admin/posts/new';
+  const callbackUrl  = searchParams.get('from') ?? '/admin';
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

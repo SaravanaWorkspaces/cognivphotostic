@@ -15,7 +15,7 @@ export default auth((req) => {
   }
 
   if (isLoggedIn && isLoginPage) {
-    return NextResponse.redirect(new URL('/admin/posts/new', req.url));
+    return NextResponse.redirect(new URL('/admin', req.url));
   }
 
   return NextResponse.next();
