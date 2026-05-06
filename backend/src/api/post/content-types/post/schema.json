@@ -7,10 +7,9 @@
     "displayName": "Post"
   },
   "options": {
-    "increments": true,
-    "timestamps": true,
     "draftAndPublish": true
   },
+  "pluginOptions": {},
   "attributes": {
     "title": {
       "type": "string",
@@ -52,9 +51,6 @@
       "type": "string",
       "default": "Admin"
     },
-    "publishedAt": {
-      "type": "datetime"
-    },
     "blocks": {
       "type": "dynamiczone",
       "components": [
@@ -63,12 +59,15 @@
         "blocks.gallery",
         "blocks.product-embed",
         "blocks.comparison-table"
-      ]
+      ],
+      "required": true,
+      "min": 1,
+      "max": 50
     },
     "seo": {
       "type": "component",
-      "repeatable": false,
-      "component": "shared.seo"
+      "component": "shared.seo",
+      "repeatable": false
     }
   }
 }

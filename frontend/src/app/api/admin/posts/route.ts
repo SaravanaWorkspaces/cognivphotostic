@@ -17,8 +17,7 @@ export async function GET() {
     const url =
       `${config.strapi.url}/api/posts` +
       `?status=draft` +
-      `&populate[coverImage][populate]=formats` +
-      `&populate[category][fields][0]=id&populate[category][fields][1]=name` +
+      `&populate=*` +
       `&sort[0]=updatedAt:desc` +
       `&pagination[pageSize]=100`;
 

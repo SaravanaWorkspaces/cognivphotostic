@@ -59,7 +59,12 @@ export interface BlocksText extends Struct.ComponentSchema {
     displayName: 'Text Block';
   };
   attributes: {
-    body: Schema.Attribute.RichText & Schema.Attribute.Required;
+    body: Schema.Attribute.RichText &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 5000;
+        minLength: 1000;
+      }>;
   };
 }
 

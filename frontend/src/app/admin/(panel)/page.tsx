@@ -18,12 +18,12 @@ async function getCounts(strapiToken: string): Promise<Counts> {
 
   // status=draft returns the latest version of every entry (incl. unpublished)
   const all = await fetch(
-    `${config.strapi.url}/api/posts?status=draft&pagination[pageSize]=1&fields=id`,
+    `${config.strapi.url}/api/posts?status=draft&pagination[pageSize]=1&fields[0]=id`,
     { headers, cache: 'no-store' },
   ).then(r => (r.ok ? r.json() : { meta: { pagination: { total: 0 } } }));
 
   const published = await fetch(
-    `${config.strapi.url}/api/posts?status=published&pagination[pageSize]=1&fields=id`,
+    `${config.strapi.url}/api/posts?status=published&pagination[pageSize]=1&fields[0]=id`,
     { headers, cache: 'no-store' },
   ).then(r => (r.ok ? r.json() : { meta: { pagination: { total: 0 } } }));
 

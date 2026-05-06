@@ -23,7 +23,7 @@ export async function GET(
 
   try {
     const res = await fetch(
-      `${config.strapi.url}/api/posts/${encodeURIComponent(id)}?status=draft&populate[coverImage][populate]=formats&populate[category][fields][0]=id&populate[category][fields][1]=name`,
+      `${config.strapi.url}/api/posts/${encodeURIComponent(id)}?status=draft&populate=*`,
       {
         headers: {
           'Content-Type': 'application/json',

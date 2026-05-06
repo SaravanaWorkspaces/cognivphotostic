@@ -25,9 +25,7 @@ async function getPosts(strapiToken: string): Promise<{ posts: AdminPostRow[]; e
     const url =
       `${config.strapi.url}/api/posts` +
       `?status=draft` +
-      `&populate[coverImage][fields][0]=url` +
-      `&populate[coverImage][populate]=formats` +
-      `&populate[category][fields][0]=name` +
+      `&populate=*` +
       `&sort[0]=updatedAt:desc` +
       `&pagination[pageSize]=100`;
 

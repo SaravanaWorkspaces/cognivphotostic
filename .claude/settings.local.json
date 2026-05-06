@@ -58,7 +58,11 @@
       "Bash(npx next *)",
       "Bash(PORT=3050 npx next dev -p 3050)",
       "Bash(echo \"PID=$!\")",
-      "Bash(kill 41505)"
+      "Bash(kill 41505)",
+      "Bash(xargs -I {} sh -c 'echo \"===== {} =====\"; cat {}')",
+      "Bash(rm \"/Users/saravana/workspace/ext_work/cognivphotostic/frontend/src/app/admin/\\(panel\\)/posts/new/page.tsx\" \"/Users/saravana/workspace/ext_work/cognivphotostic/frontend/src/app/admin/\\(panel\\)/posts/[id]/edit/page.tsx\")",
+      "Bash(rmdir \"/Users/saravana/workspace/ext_work/cognivphotostic/frontend/src/app/admin/\\(panel\\)/posts/new\" \"/Users/saravana/workspace/ext_work/cognivphotostic/frontend/src/app/admin/\\(panel\\)/posts/[id]/edit\" \"/Users/saravana/workspace/ext_work/cognivphotostic/frontend/src/app/admin/\\(panel\\)/posts/[id]\")",
+      "Bash(kill 56864)"
     ]
   }
 }

@@ -6,25 +6,23 @@ import PostForm, { type PostFormInitial } from '@/components/admin/PostForm';
 
 export const dynamic = 'force-dynamic';
 
+interface RawBlock {
+  __component: string;
+  body?: string;
+}
+
 interface RawPost {
   id: number;
   documentId: string;
   title?: string;
   slug?: string;
-  excerpt?: string;
-  author?: string;
   publishedAt?: string | null;
-  category?: { id: number; name?: string } | null;
   coverImage?: { id: number; url?: string; formats?: { medium?: { url?: string }; small?: { url?: string } } } | null;
+  blocks?: RawBlock[];
 }
 
 async function loadPost(documentId: string, strapiToken: string): Promise<RawPost | null> {
-  const url =
-    `${config.strapi.url}/api/posts/${documentId}` +
-    `?status=draft` +
-    `&populate[coverImage][populate]=formats` +
-    `&populate[category][fields][0]=id&populate[category][fields][1]=name`;
-
+  const url = `${config.strapi.url}/api/posts/${documentId}?status=draft&populate=*`;
   const res = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
@@ -32,7 +30,6 @@ async function loadPost(documentId: string, strapiToken: string): Promise<RawPos
     },
     cache: 'no-store',
   });
-
   if (!res.ok) return null;
   const json = await res.json();
   return json.data ?? null;
@@ -56,14 +53,18 @@ export default async function EditPostPage({
     post.coverImage?.url ??
     null;
 
+  // Merge all text blocks into a single HTML string for the editor.
+  const contentHtml = (post.blocks ?? [])
+    .filter(b => b.__component === 'blocks.text' && typeof b.body === 'string')
+    .map(b => b.body!)
+    .join('');
+
   const initial: PostFormInitial = {
     title:    post.title ?? '',
     slug:     post.slug ?? '',
-    excerpt:  post.excerpt ?? '',
-    author:   post.author ?? '',
-    categoryId: post.category?.id ?? null,
     coverImageId: post.coverImage?.id ?? null,
     coverPreviewUrl: coverUrl ? (coverUrl.startsWith('http') ? coverUrl : `${config.strapi.url}${coverUrl}`) : null,
+    contentHtml,
     isPublished: !!post.publishedAt,
   };
 

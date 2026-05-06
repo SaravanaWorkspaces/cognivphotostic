@@ -1,26 +1,22 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import SmartImagePicker from '@/components/ui/SmartImagePicker';
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-interface CategoryOption { id: number; documentId: string; name: string; slug: string }
+import RichTextEditor from '@/components/admin/RichTextEditor';
 
 export interface PostFormInitial {
   title: string;
   slug: string;
-  excerpt: string;
-  author: string;
-  categoryId?: number | null;
   coverImageId: number | null;
   coverPreviewUrl: string | null;
+  /** Pre-existing content as HTML (concatenated text blocks). */
+  contentHtml: string;
   isPublished: boolean;
 }
 
 interface Props {
   mode: 'create' | 'edit';
-  /** Strapi documentId (edit mode only) */
   documentId?: string;
   initial?: PostFormInitial;
 }
@@ -35,19 +31,12 @@ function toSlug(s: string) {
     .replace(/-+/g, '-');
 }
 
-function Field({
-  label, hint, required, children,
-}: { label: string; hint?: string; required?: boolean; children: React.ReactNode }) {
-  return (
-    <div className="space-y-1.5">
-      <div className="flex items-baseline gap-1">
-        <label className="text-sm font-semibold text-gray-800">{label}</label>
-        {required && <span className="text-red-500 text-xs">*</span>}
-        {hint && <span className="text-xs text-gray-400 ml-1">{hint}</span>}
-      </div>
-      {children}
-    </div>
-  );
+/** Strip HTML and collapse whitespace, then trim to maxLen for the excerpt. */
+function deriveExcerpt(html: string, maxLen = 220): string {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  const text = (tmp.textContent ?? '').replace(/\s+/g, ' ').trim();
+  return text.slice(0, maxLen);
 }
 
 const inputCls =
@@ -59,60 +48,42 @@ export default function PostForm({ mode, documentId, initial }: Props) {
   const router = useRouter();
   const isEdit = mode === 'edit';
 
-  // Form state
   const [title, setTitle] = useState(initial?.title ?? '');
-  const [slug, setSlug] = useState(initial?.slug ?? '');
-  const [slugEdited, setSlugEdited] = useState(isEdit); // don't auto-rewrite slug in edit mode
-  const [excerpt, setExcerpt] = useState(initial?.excerpt ?? '');
-  const [author, setAuthor] = useState(initial?.author ?? '');
-  const [categoryId, setCategoryId] = useState<string>(
-    initial?.categoryId != null ? String(initial.categoryId) : '',
-  );
   const [coverImageId, setCoverImageId] = useState<number | null>(initial?.coverImageId ?? null);
   const [, setCoverPreview] = useState<string | null>(initial?.coverPreviewUrl ?? null);
+  const [contentHtml, setContentHtml] = useState<string>(initial?.contentHtml ?? '');
+  const [contentText, setContentText] = useState<string>('');
 
-  // UI state
-  const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [done, setDone] = useState<{ message: string } | null>(null);
 
-  // Auto-slug from title (create mode only)
-  useEffect(() => {
-    if (!slugEdited) setSlug(toSlug(title));
-  }, [title, slugEdited]);
-
-  // Load categories
-  useEffect(() => {
-    fetch('/api/categories')
-      .then(r => r.json())
-      .then(d => setCategories(d.data ?? []))
-      .catch(() => {});
-  }, []);
-
-  // Validate required fields
+  // Required: cover, title, content
+  const hasContent = (contentText.trim().length > 0) || /<img|<a/i.test(contentHtml);
   const canSubmit =
+    coverImageId !== null &&
     title.trim().length > 0 &&
-    slug.trim().length > 0 &&
-    excerpt.trim().length > 0 &&
-    coverImageId !== null;
+    hasContent;
 
   const handleSubmit = async (publish: boolean) => {
     if (!canSubmit) return;
     setSubmitting(true);
     setSubmitError(null);
 
+    const finalSlug = toSlug(title) || `post-${Date.now()}`;
+    const finalExcerpt = deriveExcerpt(contentHtml) || title.trim();
+
     const payload: Record<string, unknown> = {
       title: title.trim(),
-      slug: slug.trim(),
-      excerpt: excerpt.trim(),
-      author: author.trim() || 'Admin',
+      slug: finalSlug,
+      excerpt: finalExcerpt,
+      author: 'Admin',
       coverImage: coverImageId,
-      ...(categoryId ? { category: parseInt(categoryId) } : { category: null }),
+      blocks: [
+        { __component: 'blocks.text', body: contentHtml },
+      ],
+      publishedAt: publish ? new Date().toISOString() : null,
     };
-
-    if (publish) payload.publishedAt = new Date().toISOString();
-    else payload.publishedAt = null; // explicit unpublish on save-draft
 
     try {
       const url = isEdit ? `/api/admin/posts/${documentId}` : '/api/admin/posts';
@@ -128,18 +99,13 @@ export default function PostForm({ mode, documentId, initial }: Props) {
         return;
       }
 
-      const newSlug = data.data?.slug ?? slug;
       setDone({
         message: isEdit
           ? (publish ? 'Post updated and published.' : 'Draft saved.')
           : (publish ? 'Post created and published.' : 'Draft created.'),
       });
 
-      // After a short pause, send the user to the right place
-      setTimeout(() => {
-        if (publish) router.push(`/blog/${newSlug}`);
-        else router.push('/admin/posts');
-      }, 1200);
+      setTimeout(() => router.push('/admin/posts'), 1200);
     } catch {
       setSubmitError('Network error — make sure the backend is running.');
     } finally {
@@ -147,7 +113,6 @@ export default function PostForm({ mode, documentId, initial }: Props) {
     }
   };
 
-  // ── Success screen ────────────────────────────────────────────────────────
   if (done) {
     return (
       <div className="flex items-center justify-center py-24">
@@ -162,10 +127,10 @@ export default function PostForm({ mode, documentId, initial }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* Cover image */}
+      {/* Header image */}
       <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
         <SmartImagePicker
-          label={isEdit ? 'Cover Image (re-upload to change)' : 'Cover Image'}
+          label="Header Image *"
           disabled={submitting}
           onPick={(img) => {
             setCoverImageId(img.fileId);
@@ -176,100 +141,61 @@ export default function PostForm({ mode, documentId, initial }: Props) {
         {isEdit && initial?.coverPreviewUrl && coverImageId === initial.coverImageId && (
           <div className="mt-3 rounded-lg overflow-hidden border border-gray-100">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={initial.coverPreviewUrl} alt="Current cover" className="w-full max-h-56 object-cover block" />
+            <img src={initial.coverPreviewUrl} alt="Current header" className="w-full max-h-56 object-cover block" />
             <p className="px-3 py-1.5 text-xs text-gray-500 bg-gray-50 border-t border-gray-100">
-              Current cover image
+              Current header image
             </p>
           </div>
         )}
       </div>
 
-      {/* Core fields */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-5">
-        <Field label="Title" required>
-          <input
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            placeholder="Enter post title…"
-            maxLength={120}
-            className={inputCls}
-          />
-        </Field>
-
-        <Field label="Slug" hint={isEdit ? 'edit with care — changes the URL' : 'auto-generated from title'}>
-          <div className="flex gap-2">
-            <input
-              value={slug}
-              onChange={e => { setSlug(toSlug(e.target.value)); setSlugEdited(true); }}
-              placeholder="post-url-slug"
-              className={`${inputCls} font-mono text-xs`}
-            />
-            {!isEdit && slugEdited && (
-              <button
-                type="button"
-                onClick={() => { setSlug(toSlug(title)); setSlugEdited(false); }}
-                className="shrink-0 px-3 text-xs text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50"
-                title="Reset to auto-generated slug"
-              >
-                Reset
-              </button>
-            )}
-          </div>
-        </Field>
-
-        <Field label="Excerpt" required hint="shown on blog cards">
-          <textarea
-            value={excerpt}
-            onChange={e => setExcerpt(e.target.value)}
-            placeholder="A short summary of this post…"
-            rows={3}
-            maxLength={300}
-            className={`${inputCls} resize-none`}
-          />
-          <p className="text-right text-xs text-gray-400">{excerpt.length}/300</p>
-        </Field>
+      {/* Title */}
+      <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+        <div className="flex items-baseline gap-1 mb-1.5">
+          <label htmlFor="post-title" className="text-sm font-semibold text-gray-800">Title</label>
+          <span className="text-red-500 text-xs">*</span>
+        </div>
+        <input
+          id="post-title"
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+          placeholder="Enter post title…"
+          maxLength={120}
+          disabled={submitting}
+          className={inputCls}
+        />
       </div>
 
-      {/* Meta */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-5">
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="Author">
-            <input
-              value={author}
-              onChange={e => setAuthor(e.target.value)}
-              placeholder="Admin"
-              className={inputCls}
-            />
-          </Field>
-
-          <Field label="Category">
-            <select
-              value={categoryId}
-              onChange={e => setCategoryId(e.target.value)}
-              className={inputCls}
-            >
-              <option value="">— None —</option>
-              {categories.map(c => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
-          </Field>
+      {/* Content */}
+      <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+        <div className="flex items-baseline gap-1 mb-1.5">
+          <label className="text-sm font-semibold text-gray-800">Content</label>
+          <span className="text-red-500 text-xs">*</span>
+          <span className="text-xs text-gray-400 ml-1">supports bold, italic, and links</span>
         </div>
+        <RichTextEditor
+          initialHtml={initial?.contentHtml ?? ''}
+          disabled={submitting}
+          onChange={(html, text) => {
+            setContentHtml(html);
+            setContentText(text);
+          }}
+          placeholder="Write your post here. Select text and click the link icon to insert a hyperlink."
+        />
       </div>
 
       {/* Validation hint */}
-      {!canSubmit && (title || excerpt || coverImageId) && (
+      {!canSubmit && (title || hasContent || coverImageId) && (
         <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
           <span>⚠️</span>
           <span>
+            {coverImageId === null ? 'Upload a header image. ' : ''}
             {!title.trim() ? 'Add a title. ' : ''}
-            {!excerpt.trim() ? 'Add an excerpt. ' : ''}
-            {coverImageId === null ? 'Upload a cover image to continue.' : ''}
+            {!hasContent ? 'Write some content.' : ''}
           </span>
         </div>
       )}
 
-      {/* Submit error */}
       {submitError && (
         <div className="flex items-start gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
           <span className="mt-0.5 shrink-0">✕</span>
@@ -277,7 +203,7 @@ export default function PostForm({ mode, documentId, initial }: Props) {
         </div>
       )}
 
-      {/* Action bar */}
+      {/* Actions */}
       <div className="flex gap-3 pt-2 pb-8">
         <button
           type="button"
@@ -293,7 +219,7 @@ export default function PostForm({ mode, documentId, initial }: Props) {
           disabled={!canSubmit || submitting}
           className="flex-1 py-3 text-sm font-semibold text-white bg-brand-600 rounded-xl hover:bg-brand-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
-          {submitting ? (isEdit ? 'Updating…' : 'Publishing…') : (isEdit ? '💾 Update & Publish' : '🚀 Publish Post')}
+          {submitting ? (isEdit ? 'Updating…' : 'Publishing…') : (isEdit ? 'Update & Publish' : 'Publish Post')}
         </button>
       </div>
     </div>

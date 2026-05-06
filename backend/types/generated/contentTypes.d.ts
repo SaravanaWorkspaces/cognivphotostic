@@ -509,8 +509,6 @@ export interface ApiPostPost extends Struct.CollectionTypeSchema {
   };
   options: {
     draftAndPublish: true;
-    increments: true;
-    timestamps: true;
   };
   attributes: {
     author: Schema.Attribute.String & Schema.Attribute.DefaultTo<'Admin'>;
@@ -522,7 +520,15 @@ export interface ApiPostPost extends Struct.CollectionTypeSchema {
         'blocks.product-embed',
         'blocks.comparison-table',
       ]
-    >;
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 50;
+          min: 1;
+        },
+        number
+      >;
     category: Schema.Attribute.Relation<'manyToOne', 'api::category.category'>;
     coverImage: Schema.Attribute.Media & Schema.Attribute.Required;
     createdAt: Schema.Attribute.DateTime;
