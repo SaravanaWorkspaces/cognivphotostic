@@ -62,7 +62,10 @@
       "Bash(xargs -I {} sh -c 'echo \"===== {} =====\"; cat {}')",
       "Bash(rm \"/Users/saravana/workspace/ext_work/cognivphotostic/frontend/src/app/admin/\\(panel\\)/posts/new/page.tsx\" \"/Users/saravana/workspace/ext_work/cognivphotostic/frontend/src/app/admin/\\(panel\\)/posts/[id]/edit/page.tsx\")",
       "Bash(rmdir \"/Users/saravana/workspace/ext_work/cognivphotostic/frontend/src/app/admin/\\(panel\\)/posts/new\" \"/Users/saravana/workspace/ext_work/cognivphotostic/frontend/src/app/admin/\\(panel\\)/posts/[id]/edit\" \"/Users/saravana/workspace/ext_work/cognivphotostic/frontend/src/app/admin/\\(panel\\)/posts/[id]\")",
-      "Bash(kill 56864)"
+      "Bash(kill 56864)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); p=d['data'][0]; print\\('keys:', list\\(p.keys\\(\\)\\)\\); print\\('coverImage keys:', list\\(p.get\\('coverImage',{}\\).keys\\(\\)\\) if p.get\\('coverImage'\\) else None\\); print\\('blocks:', [\\(b.get\\('__component'\\), list\\(b.keys\\(\\)\\)\\) for b in p.get\\('blocks',[]\\)]\\); print\\('category:', p.get\\('category'\\)\\); print\\('tags:', p.get\\('tags'\\)\\); print\\('seo:', p.get\\('seo'\\)\\)\")",
+      "Bash(python3 -c ' *)",
+      "Bash(sed -n '57,70p' /Users/saravana/workspace/ext_work/cognivphotostic/backend/types/generated/components.d.ts)"
     ]
   }
 }

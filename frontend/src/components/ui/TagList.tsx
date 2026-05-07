@@ -15,7 +15,7 @@ export default function TagList({ tags, className = '' }: TagListProps) {
           key={tag.id}
           className="inline-block px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded hover:bg-gray-200 transition-colors"
         >
-          #{tag.name}
+          #{tag.name.replace(/^#+/, '')}
         </span>
       ))}
     </div>

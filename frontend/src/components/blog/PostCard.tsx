@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { Post, StrapiItem } from '@/types';
 import CategoryBadge from '@/components/ui/CategoryBadge';
 import { IMAGE_SIZES, getSizeRecommendation } from '@/lib/image-sizes';
+import { mediaUrl } from '@/lib/media';
 
 interface PostCardProps {
   post: StrapiItem<Post>;
@@ -12,7 +13,7 @@ export default function PostCard({ post: p }: PostCardProps) {
   if (!p) return null;
 
   const imageUrl =
-    p.coverImage?.url ||
+    mediaUrl(p.coverImage?.url) ||
     'https://via.placeholder.com/400x300?text=No+Image';
   const imageAlt = p.coverImage?.alternativeText || p.title;
   const recommendedSize = getSizeRecommendation('COVER_IMAGE');

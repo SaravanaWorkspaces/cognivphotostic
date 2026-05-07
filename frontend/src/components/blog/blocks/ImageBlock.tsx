@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { ImageBlock as ImageBlockType } from '@/types';
+import { mediaUrl } from '@/lib/media';
 
 interface ImageBlockProps {
   block: ImageBlockType;
@@ -7,12 +8,14 @@ interface ImageBlockProps {
 
 export default function ImageBlock({ block }: ImageBlockProps) {
   if (!block.image) return null;
+  const src = mediaUrl(block.image.url);
+  if (!src) return null;
 
   return (
     <figure className="my-8">
       <div className="relative w-full h-96 bg-gray-100 rounded-lg overflow-hidden">
         <Image
-          src={block.image.url}
+          src={src}
           alt={block.image.alternativeText || 'Image'}
           fill
           className="object-cover"

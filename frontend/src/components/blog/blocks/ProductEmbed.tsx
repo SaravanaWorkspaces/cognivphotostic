@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ProductEmbedBlock } from '@/types';
+import { mediaUrl } from '@/lib/media';
 
 interface ProductEmbedProps {
   block: ProductEmbedBlock;
@@ -12,7 +13,7 @@ export default function ProductEmbed({ block, postId }: ProductEmbedProps) {
   if (!product) return null;
 
   const imageUrl =
-    product.image?.url || 'https://via.placeholder.com/300x200?text=No+Image';
+    mediaUrl(product.image?.url) || 'https://via.placeholder.com/300x200?text=No+Image';
 
   return (
     <div className="my-8 bg-brand-50 rounded-lg p-6 border border-brand-100">

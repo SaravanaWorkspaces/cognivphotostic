@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { auth } from '@/auth';
 import { config } from '@/lib/config';
+import { getCategories, getTags } from '@/lib/api';
 import PostForm, { type PostFormInitial } from '@/components/admin/PostForm';
 
 export const dynamic = 'force-dynamic';
@@ -18,6 +19,8 @@ interface RawPost {
   slug?: string;
   publishedAt?: string | null;
   coverImage?: { id: number; url?: string; formats?: { medium?: { url?: string }; small?: { url?: string } } } | null;
+  category?: { id: number } | null;
+  tags?: Array<{ id: number }>;
   blocks?: RawBlock[];
 }
 
@@ -44,8 +47,15 @@ export default async function EditPostPage({
   const session = await auth();
   const strapiToken = session?.user?.strapiToken ?? config.strapi.apiToken ?? '';
 
-  const post = await loadPost(id, strapiToken);
+  const [post, catsRes, tagsRes] = await Promise.all([
+    loadPost(id, strapiToken),
+    getCategories(),
+    getTags(),
+  ]);
   if (!post) notFound();
+
+  const categories = (catsRes.data ?? []).map(c => ({ id: c.id, name: c.name }));
+  const tags = (tagsRes.data ?? []).map(t => ({ id: t.id, name: t.name }));
 
   const coverUrl =
     post.coverImage?.formats?.medium?.url ??
@@ -66,6 +76,8 @@ export default async function EditPostPage({
     coverPreviewUrl: coverUrl ? (coverUrl.startsWith('http') ? coverUrl : `${config.strapi.url}${coverUrl}`) : null,
     contentHtml,
     isPublished: !!post.publishedAt,
+    categoryId: post.category?.id ?? null,
+    tagIds: (post.tags ?? []).map(t => t.id),
   };
 
   return (
@@ -91,7 +103,7 @@ export default async function EditPostPage({
         </div>
       </div>
 
-      <PostForm mode="edit" documentId={post.documentId} initial={initial} />
+      <PostForm mode="edit" documentId={post.documentId} initial={initial} categories={categories} tags={tags} />
     </div>
   );
 }

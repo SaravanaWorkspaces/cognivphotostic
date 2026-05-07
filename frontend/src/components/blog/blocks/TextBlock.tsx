@@ -1,15 +1,13 @@
 import { TextBlock as TextBlockType } from '@/types';
+import { cleanRichText } from '@/lib/html-clean';
 
 interface TextBlockProps {
   block: TextBlockType;
 }
 
 export default function TextBlock({ block }: TextBlockProps) {
+  const html = cleanRichText(block.body ?? '');
   return (
-    <div className="prose prose-lg max-w-none">
-      <div
-        dangerouslySetInnerHTML={{ __html: block.body }}
-      />
-    </div>
+    <div dangerouslySetInnerHTML={{ __html: html }} />
   );
 }

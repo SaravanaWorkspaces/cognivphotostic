@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { GalleryBlock as GalleryBlockType } from '@/types';
+import { mediaUrl } from '@/lib/media';
 
 interface GalleryBlockProps {
   block: GalleryBlockType;
@@ -20,6 +21,8 @@ export default function GalleryBlock({ block }: GalleryBlockProps) {
     <div className={`grid ${colsClass} gap-4 my-8`}>
       {images.map((img, idx) => {
         if (!img) return null;
+        const src = mediaUrl(img.url);
+        if (!src) return null;
 
         return (
           <div
@@ -27,7 +30,7 @@ export default function GalleryBlock({ block }: GalleryBlockProps) {
             className="relative w-full h-64 bg-gray-100 rounded-lg overflow-hidden"
           >
             <Image
-              src={img.url}
+              src={src}
               alt={img.alternativeText || `Gallery image ${idx + 1}`}
               fill
               className="object-cover hover:scale-105 transition-transform"

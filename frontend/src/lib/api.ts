@@ -87,8 +87,27 @@ function qs(params: Record<string, unknown>): string {
 
 // ─── Posts ────────────────────────────────────────────────────────────────────
 
+// Strapi 5: `populate=*` only fills top-level relations and does NOT recurse
+// into dynamic-zone components. We need an explicit per-component populate so
+// each block's own relations (cover image inside blocks.image, product inside
+// blocks.product-embed, etc.) come back with the post.
 const POST_POPULATE = {
-  populate: '*',
+  populate: {
+    coverImage: true,
+    category: true,
+    tags: true,
+    products: true,
+    seo: { populate: '*' },
+    blocks: {
+      on: {
+        'blocks.text': { populate: '*' },
+        'blocks.image': { populate: '*' },
+        'blocks.gallery': { populate: '*' },
+        'blocks.product-embed': { populate: { product: { populate: '*' } } },
+        'blocks.comparison-table': { populate: '*' },
+      },
+    },
+  },
 };
 
 export async function getPosts(params?: {
@@ -120,7 +139,7 @@ export async function getPosts(params?: {
 
 export async function getPostBySlug(slug: string): Promise<StrapiSingleResponse<StrapiItem<Post>> | null> {
   const query = qs({
-    populate: '*',
+    ...POST_POPULATE,
     filters: { slug: { $eq: slug } },
   });
 
@@ -142,6 +161,15 @@ export async function getCategories(): Promise<StrapiListResponse<StrapiItem<Cat
   return fetchStrapi<StrapiListResponse<StrapiItem<Category>>>(`/categories${query}`, {
     revalidate: config.revalidate.categories,
     tags: ['categories'],
+  });
+}
+
+export async function getTags(): Promise<StrapiListResponse<StrapiItem<Tag>>> {
+  const query = qs({ pagination: { pageSize: 200 }, sort: ['name:asc'] });
+
+  return fetchStrapi<StrapiListResponse<StrapiItem<Tag>>>(`/tags${query}`, {
+    revalidate: config.revalidate.categories,
+    tags: ['tags'],
   });
 }
 
