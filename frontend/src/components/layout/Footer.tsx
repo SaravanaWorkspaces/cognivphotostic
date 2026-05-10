@@ -12,7 +12,7 @@ export default function Footer() {
               CognivPhotostic
             </h3>
             <p className="text-sm text-gray-600">
-              Home decor, interior design, and lifestyle inspiration for your space.
+              Interior, lifestyle and fashion stories with a South Indian soul.
             </p>
           </div>
 

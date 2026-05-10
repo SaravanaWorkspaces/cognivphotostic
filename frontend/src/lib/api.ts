@@ -155,8 +155,17 @@ export async function getPostBySlug(slug: string): Promise<StrapiSingleResponse<
 
 // ─── Categories ───────────────────────────────────────────────────────────────
 
-export async function getCategories(): Promise<StrapiListResponse<StrapiItem<Category>>> {
-  const query = qs({});
+export async function getCategories(opts?: {
+  topLevelOnly?: boolean;
+}): Promise<StrapiListResponse<StrapiItem<Category>>> {
+  const query = qs({
+    pagination: { pageSize: 100 },
+    sort: ['name:asc'],
+    populate: { parent: { fields: ['slug'] } },
+    ...(opts?.topLevelOnly
+      ? { filters: { parent: { id: { $null: true } } } }
+      : {}),
+  });
 
   return fetchStrapi<StrapiListResponse<StrapiItem<Category>>>(`/categories${query}`, {
     revalidate: config.revalidate.categories,
@@ -174,7 +183,13 @@ export async function getTags(): Promise<StrapiListResponse<StrapiItem<Tag>>> {
 }
 
 export async function getCategoryBySlug(slug: string): Promise<StrapiSingleResponse<StrapiItem<Category>> | null> {
-  const query = qs({ filters: { slug: { $eq: slug } } });
+  const query = qs({
+    filters: { slug: { $eq: slug } },
+    populate: {
+      parent: { fields: ['name', 'slug'] },
+      children: { fields: ['name', 'slug'], sort: ['name:asc'] },
+    },
+  });
 
   const res = await fetchStrapi<StrapiListResponse<StrapiItem<Category>>>(`/categories${query}`, {
     revalidate: config.revalidate.categories,

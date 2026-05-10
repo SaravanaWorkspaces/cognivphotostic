@@ -1,5 +1,7 @@
 'use strict';
 
+const { categories: taxonomyCategories, tags: taxonomyTags } = require('./data/taxonomy');
+
 module.exports = {
   register(/* { strapi } */) {},
 
@@ -7,6 +9,7 @@ module.exports = {
     await setupPublicPermissions(strapi);
     await setupAuthenticatedPermissions(strapi);
     await provisionAdminUser(strapi);
+    await seedTaxonomy(strapi);
   },
 };
 
@@ -145,5 +148,81 @@ async function provisionAdminUser(strapi) {
     strapi.log.info(`✓ Admin user "${username}" <${email}> created`);
   } catch (err) {
     strapi.log.error('✗ Admin user provisioning failed:', err.message);
+  }
+}
+
+// ─── Taxonomy seed: idempotent — match by slug, create or update ──────────────
+async function seedTaxonomy(strapi) {
+  try {
+    // Pass 1: upsert every category without parent links so all rows exist.
+    const slugToId = {};
+    for (const cat of taxonomyCategories) {
+      const existing = await strapi.documents('api::category.category').findFirst({
+        filters: { slug: cat.slug },
+      });
+
+      const payload = {
+        name: cat.name,
+        slug: cat.slug,
+        description: cat.description || null,
+      };
+
+      if (existing) {
+        await strapi.documents('api::category.category').update({
+          documentId: existing.documentId,
+          data: payload,
+          status: 'published',
+        });
+        slugToId[cat.slug] = existing.documentId;
+      } else {
+        const created = await strapi.documents('api::category.category').create({
+          data: payload,
+          status: 'published',
+        });
+        slugToId[cat.slug] = created.documentId;
+      }
+    }
+
+    // Pass 2: link parents now that all documentIds are known.
+    for (const cat of taxonomyCategories) {
+      if (!cat.parent) continue;
+      const parentId = slugToId[cat.parent];
+      const childId = slugToId[cat.slug];
+      if (!parentId || !childId) continue;
+
+      await strapi.documents('api::category.category').update({
+        documentId: childId,
+        data: { parent: parentId },
+        status: 'published',
+      });
+    }
+
+    // Tags
+    for (const tag of taxonomyTags) {
+      const existing = await strapi.documents('api::tag.tag').findFirst({
+        filters: { slug: tag.slug },
+      });
+
+      const payload = { name: tag.name, slug: tag.slug };
+
+      if (existing) {
+        await strapi.documents('api::tag.tag').update({
+          documentId: existing.documentId,
+          data: payload,
+          status: 'published',
+        });
+      } else {
+        await strapi.documents('api::tag.tag').create({
+          data: payload,
+          status: 'published',
+        });
+      }
+    }
+
+    strapi.log.info(
+      `✓ Taxonomy seeded: ${taxonomyCategories.length} categories, ${taxonomyTags.length} tags`
+    );
+  } catch (err) {
+    strapi.log.warn('⚠ Taxonomy seeding failed:', err.message);
   }
 }

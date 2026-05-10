@@ -8,7 +8,7 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Blog',
-  description: 'Explore our collection of home decor and interior design articles.',
+  description: 'Stories on interiors, fashion and lifestyle with a South Indian soul.',
 };
 
 interface BlogPageProps {
@@ -35,7 +35,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             Blog
           </h1>
           <p className="text-lg text-gray-600">
-            Discover inspiring home decor ideas and interior design tips.
+            Stories on interiors, fashion and lifestyle with a South Indian soul.
           </p>
         </div>
 

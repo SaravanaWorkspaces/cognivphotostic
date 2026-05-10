@@ -20,10 +20,10 @@ export default async function HomePage() {
       <section className="bg-gradient-to-br from-brand-50 to-brand-100 py-20">
         <div className="container-wide text-center">
           <h1 className="font-serif text-5xl font-bold text-gray-900 mb-4">
-            Transform Your Space
+            South Indian Soul, Modern Living
           </h1>
           <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
-            Discover inspiring home decor ideas, interior design tips, and lifestyle trends to elevate your living space.
+            Interiors, fashion and lifestyle stories rooted in the South — from Chettinad courtyards and Kanjivaram silks to filter coffee mornings.
           </p>
           <Link
             href="/blog"
@@ -41,7 +41,7 @@ export default async function HomePage() {
             Featured Articles
           </h2>
           <p className="text-lg text-gray-600">
-            Our latest home decor and interior design inspiration.
+            Fresh stories on interiors, fashion and South Indian living.
           </p>
         </div>
 

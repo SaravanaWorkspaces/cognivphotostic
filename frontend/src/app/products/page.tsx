@@ -16,7 +16,7 @@ export default async function ProductsPage() {
             Recommended Products
           </h1>
           <p className="text-lg text-gray-600">
-            Handpicked products for your home decor and lifestyle needs.
+            Handpicked sarees, jewellery, decor and lifestyle finds.
           </p>
         </div>
 

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getCategoryBySlug, getPosts, getCategories } from '@/lib/api';
 import { config } from '@/lib/config';
@@ -37,7 +38,7 @@ export async function generateMetadata({
     const category = response.data as Category;
 
     return {
-      title: `${category.name} - Home Decor & Interior Design`,
+      title: `${category.name} — ${config.site.name}`,
       description:
         category.description || `Explore articles in the ${category.name} category.`,
     };
@@ -77,11 +78,33 @@ export default async function CategoryPage({
     return (
       <div className="container-wide py-12">
         <div className="mb-8">
-          <h1 className="font-serif text-4xl font-bold text-gray-900 mb-2">
+          {category.parent && (
+            <Link
+              href={`/category/${category.parent.slug}`}
+              className="text-sm text-gray-500 hover:text-brand-600"
+            >
+              ← {category.parent.name}
+            </Link>
+          )}
+          <h1 className="font-serif text-4xl font-bold text-gray-900 mb-2 mt-1">
             {category.name}
           </h1>
           {category.description && (
             <p className="text-lg text-gray-600">{category.description}</p>
+          )}
+
+          {category.children && category.children.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-6">
+              {category.children.map((child) => (
+                <Link
+                  key={child.id}
+                  href={`/category/${child.slug}`}
+                  className="px-3 py-1 text-sm rounded-full bg-brand-50 text-brand-700 hover:bg-brand-100"
+                >
+                  {child.name}
+                </Link>
+              ))}
+            </div>
           )}
         </div>
 

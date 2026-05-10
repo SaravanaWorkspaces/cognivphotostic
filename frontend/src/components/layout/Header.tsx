@@ -6,7 +6,7 @@ import { Category } from '@/types';
 export default async function Header() {
   let categories: StrapiItem<Category>[] = [];
   try {
-    const res = await getCategories();
+    const res = await getCategories({ topLevelOnly: true });
     categories = res.data || [];
   } catch (err) {
     // Silently fail on header load — not critical
@@ -32,7 +32,7 @@ export default async function Header() {
 
           {categories.length > 0 && (
             <div className="hidden md:flex items-center gap-4">
-              {categories.filter((cat) => cat.slug).slice(0, 4).map((cat) => (
+              {categories.filter((cat) => cat.slug).slice(0, 5).map((cat) => (
                 <Link
                   key={cat.id}
                   href={`/category/${cat.slug}`}

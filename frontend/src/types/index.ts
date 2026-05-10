@@ -68,6 +68,8 @@ export interface Category {
   name: string;
   slug: string;
   description: string | null;
+  parent?: StrapiItem<Category> | null;
+  children?: StrapiItem<Category>[];
   createdAt?: string;
   updatedAt?: string;
   publishedAt?: string;

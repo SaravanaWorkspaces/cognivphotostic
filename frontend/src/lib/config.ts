@@ -7,7 +7,7 @@ export const config = {
   site: {
     url: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
     name: 'CognivPhotostic',
-    description: 'Home decor, interior design, and lifestyle inspiration',
+    description: 'Interior, lifestyle and fashion stories with a South Indian soul',
   },
   pagination: {
     pageSize: 12,
